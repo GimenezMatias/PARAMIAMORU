@@ -1,23 +1,20 @@
-onload = () =>{
-    document.body.classList.remove("container");
-};
-
 window.addEventListener("load", () => {
-
-  // esto mantiene la animación funcionando
   document.body.classList.remove("container");
 
-  // esto es lo del audio
-  if (localStorage.getItem("playAudio") === "true") {
-    const audio = document.getElementById("musica");
+  const audio = document.getElementById("musica");
+  const btn = document.getElementById("startBtn");
 
-    audio.play().catch(() => {
-      document.body.addEventListener("click", () => {
+  btn.addEventListener("click", () => {
+    
+    // Espera a que el audio esté listo
+    if (audio.readyState >= 3) {
+      audio.play();
+    } else {
+      audio.addEventListener("canplaythrough", () => {
         audio.play();
       }, { once: true });
-    });
+    }
 
-    localStorage.removeItem("playAudio");
-  }
-
+    btn.style.display = "none";
+  });
 });
