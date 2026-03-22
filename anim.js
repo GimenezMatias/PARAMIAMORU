@@ -5,10 +5,6 @@ var lyrics = document.querySelector("#lyrics");
 // Fecha de inicio: 12 de febrero de 2026 a las 03:40
 var fechaInicio = new Date(2026, 1, 12, 3, 40, 0); // Meses 0-index (1 = febrero)
 
-function formatNumber(n) {
-  return n < 10 ? "0" + n : n;
-}
-
 function pluralize(value, singular, plural) {
   return value + " " + (value === 1 ? singular : plural);
 }
@@ -21,66 +17,68 @@ function calcularDiferencia() {
     msDiferencia = 0;
   }
 
+  // TIEMPO TOTAL
   var totalSegundos = Math.floor(msDiferencia / 1000);
-  var dias = Math.floor(totalSegundos / 86400);
+  var diasTotal = Math.floor(totalSegundos / 86400);
   var restoSegundos = totalSegundos % 86400;
   var horas = Math.floor(restoSegundos / 3600);
   restoSegundos %= 3600;
   var minutos = Math.floor(restoSegundos / 60);
   var segundos = restoSegundos % 60;
 
-  // Cálculo de meses + días (dos partes) a partir de la misma fecha
-var años = ahora.getFullYear() - fechaInicio.getFullYear();
-var meses = ahora.getMonth() - fechaInicio.getMonth();
-var dias = ahora.getDate() - fechaInicio.getDate();
+  // CÁLCULO CORRECTO DE AÑOS, MESES Y DÍAS
+  var años = ahora.getFullYear() - fechaInicio.getFullYear();
+  var meses = ahora.getMonth() - fechaInicio.getMonth();
+  var diasMes = ahora.getDate() - fechaInicio.getDate();
 
-if (dias < 0) {
-  meses -= 1;
-  // días del mes anterior
-  var ultimoMes = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
-  dias += ultimoMes.getDate();
-}
+  if (diasMes < 0) {
+    meses -= 1;
+    var ultimoMes = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
+    diasMes += ultimoMes.getDate();
+  }
 
-if (meses < 0) {
-  años -= 1;
-  meses += 12;
-}
-
-var diasMeses = dias;
+  if (meses < 0) {
+    años -= 1;
+    meses += 12;
+  }
 
   var detalleMesesDias = [];
+
   if (años > 0) {
     detalleMesesDias.push(pluralize(años, "año", "años"));
   }
+
   if (meses > 0) {
     detalleMesesDias.push(pluralize(meses, "mes", "meses"));
   }
-  detalleMesesDias.push(pluralize(diasMeses, "día", "días"));
 
+  detalleMesesDias.push(pluralize(diasMes, "día", "días"));
+
+  // MOSTRAR RESULTADO
   lyrics.style.opacity = 1;
   lyrics.innerHTML =
-    pluralize(dias, "día", "días") + ", " +
+    pluralize(diasTotal, "día", "días") + ", " +
     pluralize(horas, "hora", "horas") + ", " +
     pluralize(minutos, "minuto", "minutos") + ", " +
     pluralize(segundos, "segundo", "segundos") +
     "<br>(" + detalleMesesDias.join(", ") + ")";
 }
 
-// Actualizar el texto cada segundo
+// Actualizar cada segundo
 calcularDiferencia();
 setInterval(calcularDiferencia, 1000);
 
-//funcion titulo
-// Función para ocultar el título después de 216 segundos
+// Función para ocultar el título
 function ocultarTitulo() {
   var titulo = document.querySelector(".titulo");
   if (!titulo) return;
-  titulo.style.animation =
-    "fadeOut 3s ease-in-out forwards"; /* Duración y función de temporización de la desaparición */
+
+  titulo.style.animation = "fadeOut 3s ease-in-out forwards";
+
   setTimeout(function () {
     titulo.style.display = "none";
-  }, 3000); // Espera 3 segundos antes de ocultar completamente
+  }, 3000);
 }
 
-// Llama a la función después de 216 segundos (216,000 milisegundos)
+// Ejecutar después de 216 segundos
 setTimeout(ocultarTitulo, 216000);
