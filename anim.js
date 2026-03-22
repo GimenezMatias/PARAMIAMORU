@@ -1,3 +1,19 @@
+// AUDIO
+window.addEventListener("load", () => {
+  const audio = document.getElementById("musica");
+
+  if (localStorage.getItem("playAudio") === "true") {
+    audio.play().catch(() => {
+      // fallback por si el navegador bloquea
+      document.body.addEventListener("click", () => {
+        audio.play();
+      }, { once: true });
+    });
+
+    localStorage.removeItem("playAudio");
+  }
+});
+
 // Sincronizar las letras con la canción
 var audio = document.querySelector("audio");
 var lyrics = document.querySelector("#lyrics");
