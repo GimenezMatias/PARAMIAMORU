@@ -30,30 +30,23 @@ function calcularDiferencia() {
   var segundos = restoSegundos % 60;
 
   // Cálculo de meses + días (dos partes) a partir de la misma fecha
-  var mesesTotales =
-    ahora.getFullYear() * 12 + ahora.getMonth() -
-    (fechaInicio.getFullYear() * 12 + fechaInicio.getMonth());
+var años = ahora.getFullYear() - fechaInicio.getFullYear();
+var meses = ahora.getMonth() - fechaInicio.getMonth();
+var dias = ahora.getDate() - fechaInicio.getDate();
 
-  if (mesesTotales < 0) {
-    mesesTotales = 0;
-  }
+if (dias < 0) {
+  meses -= 1;
+  // días del mes anterior
+  var ultimoMes = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
+  dias += ultimoMes.getDate();
+}
 
-  var fechaConMeses = new Date(fechaInicio.getTime());
-  fechaConMeses.setMonth(fechaInicio.getMonth() + mesesTotales);
+if (meses < 0) {
+  años -= 1;
+  meses += 12;
+}
 
-  if (fechaConMeses > ahora) {
-    mesesTotales -= 1;
-    fechaConMeses = new Date(fechaInicio.getTime());
-    fechaConMeses.setMonth(fechaInicio.getMonth() + mesesTotales);
-  }
-
-  var diasMeses = Math.floor((ahora - fechaConMeses) / 86400000);
-  if (diasMeses < 0) {
-    diasMeses = 0;
-  }
-
-  var años = Math.floor(mesesTotales / 12);
-  var meses = mesesTotales % 12;
+var diasMeses = dias;
 
   var detalleMesesDias = [];
   if (años > 0) {
