@@ -1,45 +1,53 @@
-// Zona horaria fija Argentina (UTC-3)
-function ahoraArgentina() {
-  const ahora = new Date();
-  const utc = ahora.getTime() + (ahora.getTimezoneOffset() * 60000);
-  return new Date(utc - (3 * 60 * 60 * 1000));
-}
-
-// Fecha de inicio en Argentina (12 Feb 2026 03:40)
-const fechaInicio = new Date(Date.UTC(2026, 1, 12, 6, 40, 0));
-// (Sumamos +3 horas porque UTC → Argentina es -3)
-
+// Sincronizar las letras con la canción
+var audio = document.querySelector("audio");
 var lyrics = document.querySelector("#lyrics");
+
+// Fecha de inicio (con hora para el contador principal)
+var fechaInicio = new Date(2026, 1, 12, 3, 40, 0);
+
+// Fecha SOLO para meses/días (sin hora)
+var fechaInicioDia = new Date(2026, 1, 12);
+fechaInicioDia.setHours(0, 0, 0, 0);
 
 function pluralize(value, singular, plural) {
   return value + " " + (value === 1 ? singular : plural);
 }
 
 function calcularDiferencia() {
-  const ahora = ahoraArgentina();
+  var ahora = new Date();
 
-  let msDiferencia = ahora - fechaInicio;
-  if (msDiferencia < 0) msDiferencia = 0;
+  // =========================
+  // PARTE 1: TIEMPO EXACTO
+  // =========================
+  var msDiferencia = ahora - fechaInicio;
 
-  // TIEMPO TOTAL
-  const totalSegundos = Math.floor(msDiferencia / 1000);
-  const diasTotal = Math.floor(totalSegundos / 86400);
-  let restoSegundos = totalSegundos % 86400;
+  if (msDiferencia < 0) {
+    msDiferencia = 0;
+  }
 
-  const horas = Math.floor(restoSegundos / 3600);
+  var totalSegundos = Math.floor(msDiferencia / 1000);
+  var dias = Math.floor(totalSegundos / 86400);
+  var restoSegundos = totalSegundos % 86400;
+
+  var horas = Math.floor(restoSegundos / 3600);
   restoSegundos %= 3600;
 
-  const minutos = Math.floor(restoSegundos / 60);
-  const segundos = restoSegundos % 60;
+  var minutos = Math.floor(restoSegundos / 60);
+  var segundos = restoSegundos % 60;
 
-  // CÁLCULO EXACTO (Argentina)
-  let años = ahora.getFullYear() - fechaInicio.getUTCFullYear();
-  let meses = ahora.getMonth() - fechaInicio.getUTCMonth();
-  let diasMes = ahora.getDate() - fechaInicio.getUTCDate();
+  // =========================
+  // PARTE 2: MESES Y DÍAS (SIN HORAS)
+  // =========================
+  var hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+
+  var años = hoy.getFullYear() - fechaInicioDia.getFullYear();
+  var meses = hoy.getMonth() - fechaInicioDia.getMonth();
+  var diasMes = hoy.getDate() - fechaInicioDia.getDate();
 
   if (diasMes < 0) {
     meses -= 1;
-    const ultimoMes = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
+    var ultimoMes = new Date(hoy.getFullYear(), hoy.getMonth(), 0);
     diasMes += ultimoMes.getDate();
   }
 
@@ -48,45 +56,43 @@ function calcularDiferencia() {
     meses += 12;
   }
 
-  const detalle = [];
+  var detalleMesesDias = [];
 
   if (años > 0) {
-    detalle.push(pluralize(años, "año", "años"));
+    detalleMesesDias.push(pluralize(años, "año", "años"));
   }
 
   if (meses > 0) {
-    detalle.push(pluralize(meses, "mes", "meses"));
+    detalleMesesDias.push(pluralize(meses, "mes", "meses"));
   }
 
-  detalle.push(pluralize(diasMes, "día", "días"));
+  detalleMesesDias.push(pluralize(diasMes, "día", "días"));
 
+  // =========================
   // OUTPUT
+  // =========================
   lyrics.style.opacity = 1;
   lyrics.innerHTML =
-    pluralize(diasTotal, "día", "días") + ", " +
+    pluralize(dias, "día", "días") + ", " +
     pluralize(horas, "hora", "horas") + ", " +
     pluralize(minutos, "minuto", "minutos") + ", " +
     pluralize(segundos, "segundo", "segundos") +
-    "<br>(" + detalle.join(", ") + ")";
+    "<br>(" + detalleMesesDias.join(", ") + ")";
 }
 
-// LOOP
+// Actualizar cada segundo
 calcularDiferencia();
 setInterval(calcularDiferencia, 1000);
 
-// OCULTAR TÍTULO
+// Función para ocultar el título
 function ocultarTitulo() {
-  const titulo = document.querySelector(".titulo");
+  var titulo = document.querySelector(".titulo");
   if (!titulo) return;
 
   titulo.style.animation = "fadeOut 3s ease-in-out forwards";
 
-  setTimeout(() => {
+  setTimeout(function () {
     titulo.style.display = "none";
-  }, 3000);
-}
-
-setTimeout(ocultarTitulo, 216000);
   }, 3000);
 }
 
