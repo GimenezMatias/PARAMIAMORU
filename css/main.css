@@ -1,3 +1,8 @@
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
 
 *,
