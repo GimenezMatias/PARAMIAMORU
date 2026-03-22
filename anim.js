@@ -1,39 +1,45 @@
-// Sincronizar las letras con la canción
-var audio = document.querySelector("audio");
-var lyrics = document.querySelector("#lyrics");
+// Zona horaria fija Argentina (UTC-3)
+function ahoraArgentina() {
+  const ahora = new Date();
+  const utc = ahora.getTime() + (ahora.getTimezoneOffset() * 60000);
+  return new Date(utc - (3 * 60 * 60 * 1000));
+}
 
-// Fecha de inicio: 12 de febrero de 2026 a las 03:40
-var fechaInicio = new Date(2026, 1, 12, 3, 40, 0); // Meses 0-index (1 = febrero)
+// Fecha de inicio en Argentina (12 Feb 2026 03:40)
+const fechaInicio = new Date(Date.UTC(2026, 1, 12, 6, 40, 0));
+// (Sumamos +3 horas porque UTC → Argentina es -3)
+
+var lyrics = document.querySelector("#lyrics");
 
 function pluralize(value, singular, plural) {
   return value + " " + (value === 1 ? singular : plural);
 }
 
 function calcularDiferencia() {
-  var ahora = new Date();
-  var msDiferencia = ahora - fechaInicio;
+  const ahora = ahoraArgentina();
 
-  if (msDiferencia < 0) {
-    msDiferencia = 0;
-  }
+  let msDiferencia = ahora - fechaInicio;
+  if (msDiferencia < 0) msDiferencia = 0;
 
   // TIEMPO TOTAL
-  var totalSegundos = Math.floor(msDiferencia / 1000);
-  var diasTotal = Math.floor(totalSegundos / 86400);
-  var restoSegundos = totalSegundos % 86400;
-  var horas = Math.floor(restoSegundos / 3600);
-  restoSegundos %= 3600;
-  var minutos = Math.floor(restoSegundos / 60);
-  var segundos = restoSegundos % 60;
+  const totalSegundos = Math.floor(msDiferencia / 1000);
+  const diasTotal = Math.floor(totalSegundos / 86400);
+  let restoSegundos = totalSegundos % 86400;
 
-  // CÁLCULO CORRECTO DE AÑOS, MESES Y DÍAS
-  var años = ahora.getFullYear() - fechaInicio.getFullYear();
-  var meses = ahora.getMonth() - fechaInicio.getMonth();
-  var diasMes = ahora.getDate() - fechaInicio.getDate();
+  const horas = Math.floor(restoSegundos / 3600);
+  restoSegundos %= 3600;
+
+  const minutos = Math.floor(restoSegundos / 60);
+  const segundos = restoSegundos % 60;
+
+  // CÁLCULO EXACTO (Argentina)
+  let años = ahora.getFullYear() - fechaInicio.getUTCFullYear();
+  let meses = ahora.getMonth() - fechaInicio.getUTCMonth();
+  let diasMes = ahora.getDate() - fechaInicio.getUTCDate();
 
   if (diasMes < 0) {
     meses -= 1;
-    var ultimoMes = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
+    const ultimoMes = new Date(ahora.getFullYear(), ahora.getMonth(), 0);
     diasMes += ultimoMes.getDate();
   }
 
@@ -42,41 +48,45 @@ function calcularDiferencia() {
     meses += 12;
   }
 
-  var detalleMesesDias = [];
+  const detalle = [];
 
   if (años > 0) {
-    detalleMesesDias.push(pluralize(años, "año", "años"));
+    detalle.push(pluralize(años, "año", "años"));
   }
 
   if (meses > 0) {
-    detalleMesesDias.push(pluralize(meses, "mes", "meses"));
+    detalle.push(pluralize(meses, "mes", "meses"));
   }
 
-  detalleMesesDias.push(pluralize(diasMes, "día", "días"));
+  detalle.push(pluralize(diasMes, "día", "días"));
 
-  // MOSTRAR RESULTADO
+  // OUTPUT
   lyrics.style.opacity = 1;
   lyrics.innerHTML =
     pluralize(diasTotal, "día", "días") + ", " +
     pluralize(horas, "hora", "horas") + ", " +
     pluralize(minutos, "minuto", "minutos") + ", " +
     pluralize(segundos, "segundo", "segundos") +
-    "<br>(" + detalleMesesDias.join(", ") + ")";
+    "<br>(" + detalle.join(", ") + ")";
 }
 
-// Actualizar cada segundo
+// LOOP
 calcularDiferencia();
 setInterval(calcularDiferencia, 1000);
 
-// Función para ocultar el título
+// OCULTAR TÍTULO
 function ocultarTitulo() {
-  var titulo = document.querySelector(".titulo");
+  const titulo = document.querySelector(".titulo");
   if (!titulo) return;
 
   titulo.style.animation = "fadeOut 3s ease-in-out forwards";
 
-  setTimeout(function () {
+  setTimeout(() => {
     titulo.style.display = "none";
+  }, 3000);
+}
+
+setTimeout(ocultarTitulo, 216000);
   }, 3000);
 }
 
