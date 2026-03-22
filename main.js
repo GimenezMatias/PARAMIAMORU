@@ -2,13 +2,16 @@ onload = () =>{
     document.body.classList.remove("container");
 };
 
-window.onload = () => {
+window.addEventListener("load", () => {
+
+  // esto mantiene la animación funcionando
+  document.body.classList.remove("container");
+
+  // esto es lo del audio
   if (localStorage.getItem("playAudio") === "true") {
     const audio = document.getElementById("musica");
 
-    // Intento de reproducción
     audio.play().catch(() => {
-      // fallback si iOS bloquea
       document.body.addEventListener("click", () => {
         audio.play();
       }, { once: true });
@@ -16,4 +19,5 @@ window.onload = () => {
 
     localStorage.removeItem("playAudio");
   }
-};
+
+});
